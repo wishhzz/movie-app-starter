@@ -6,9 +6,9 @@ function App() {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
-
+    const controller = new AbortController();
     if (!query) return;
-    fetch(`https://www.omdbapi.com/?apikey=${KEY}&s=${query}`)
+    fetch(`https://www.omdbapi.com/?apikey=${KEY}&s=${query}`, { signal: controller.signal })
       .then((res) => res.json())
       .then((data) => {
         if (data.Response === "True") {
@@ -20,6 +20,7 @@ function App() {
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
+    return () => controller.abort();
   }, [query]);
 
   return (
