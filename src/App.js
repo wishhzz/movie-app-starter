@@ -1,17 +1,37 @@
-import { useEffect, useState } from "react";
-const KEY = "";
+import { use, useEffect, useState } from "react";
+const KEY = "d369b54e";
 
 function App() {
+  const [query, setQuery] = useState("batman");
   const [movies, setMovies] = useState([]);
 
-  fetch(`https://www.omdbapi.com/?apikey=${KEY}&s=batman`)
-    .then((res) => res.json())
-    .then((data) => setMovies(data.Search));
+  useEffect(() => {
+
+    if (!query) return;
+    fetch(`https://www.omdbapi.com/?apikey=${KEY}&s=${query}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.Response === "True") {
+          setMovies(data.Search);
+      } else {
+          setMovies([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, [query]);
 
   return (
     <div>
       <h1>Movies</h1>
-      <input type="text" placeholder="Search movies..." />
+      <input 
+      type="text" 
+      placeholder="Search movies..." 
+      value={query}
+      onChange={(e) => setQuery(e.target.value)} 
+      />
+
       <table>
         <thead>
           <tr>
@@ -28,6 +48,7 @@ function App() {
           ))}
         </tbody>
       </table>
+      {movies.length === 0 && <p>No movies found.</p>}
     </div>
   );
 }
